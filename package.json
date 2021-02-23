@@ -1,0 +1,22 @@
+{
+  "name": "make-react",
+  "version": "1.0.0",
+  "description": "编写一个React之前，我们需要制定一个目标，有了目标我们就能更清晰地step by step地完成自己的React~。",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/7zf001/make-react.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/7zf001/make-react/issues"
+  },
+  "homepage": "https://github.com/7zf001/make-react#readme"
+}
