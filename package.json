@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/7zf001/make-react/issues"
   },
-  "homepage": "https://github.com/7zf001/make-react#readme"
+  "homepage": "https://github.com/7zf001/make-react#readme",
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
 }

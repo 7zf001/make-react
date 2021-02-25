@@ -10,3 +10,27 @@
 6. 实现协调（Reconciliation）
 7. 实现函数组件
 8. 实现基本的hook
+9. 使用jest测试我们的React
+10. 使用Lerna管理npm库
+
+
+# 一、jsx是如何转换成createElement的
+
+
+```
+import React from 'react';
+
+function App() {
+  return <h1>Hello World</h1>;
+}
+
+---通过babel转义后---
+
+import React from 'react';
+
+function App() {
+  return React.createElement('h1', null, 'Hello world');
+}
+```
+
+> jsx在17版本中不在编译成createElement而是自动从 React 的 package 中引入新的入口函数并调用
