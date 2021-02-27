@@ -1,4 +1,4 @@
-const createElement = require("../createElement");
+const { createElement, createTextElement } = require("../createElement");
 
 describe("createElement测试", () => {
   test("createElement 返回值", () => {
@@ -10,14 +10,14 @@ describe("createElement测试", () => {
     expect(createElement("div", null, "a")).toMatchObject({
       type: "div",
       props: {
-        children: ["a"],
+        children: [createTextElement("a")],
       },
     });
 
     expect(createElement("div", null, "a", "b")).toMatchObject({
       type: "div",
       props: {
-        children: ["a", "b"],
+        children: [createTextElement("a"), createTextElement("b")],
       },
     });
   });

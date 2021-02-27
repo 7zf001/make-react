@@ -1,17 +1,29 @@
 /**
- * React.createElement
- * @param {string} type 
- * @param {object} props 
- * @param  {...any} children 
+ *  transform the JSX to JS
+ * @param {string} type
+ * @param {object} props
+ * @param  {...any} children
  */
 function createElement(type, props, ...children) {
   return {
-      type,
-      props: {
-          ...props,
-          children
-      }
-  }
+    type,
+    props: {
+      ...props,
+      children: children.map((child) =>
+        typeof child === "object" ? child : createTextElement(child)
+      ),
+    },
+  };
 }
 
-module.exports = createElement
+function createTextElement(text) {
+  return {
+    type: "TEXT_ELEMENT",
+    props: {
+      nodeValue: text,
+      children: [], // 简化
+    },
+  };
+}
+
+module.exports = {createElement, createTextElement};
