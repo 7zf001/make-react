@@ -93,6 +93,16 @@ function performUnitOfWork(fiber) {
   }
 
   // 返回下个工作单元
+  if (fiber.child) {
+    return fiber.child;
+  }
+  let nextFiber = fiber;
+  while (nextFiber) {
+    if (nextFiber.sibling) {
+      return nextFiber.sibling;
+    }
+    nextFiber = nextFiber.parent;
+  }
 }
 
 module.exports = { render };
