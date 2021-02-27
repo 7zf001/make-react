@@ -21,7 +21,7 @@ module.exports = {
           options: {
             presets: ['@babel/preset-env'],
             // pragma 影响函数名 , { pragma: 'MakeR.createElement' }
-            plugins: [['@babel/plugin-transform-react-jsx']],
+            plugins: [['@babel/plugin-transform-react-jsx', { pragma: 'MakeR.createElement' }]],
           },
         },
       },
