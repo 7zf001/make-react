@@ -5,18 +5,41 @@
  * 优化render：将任务拆解为最小单元，如果有更高优先级的任务则中断渲染。
  *
  * 问题2：当DOM tree节点过多时，就算我们使用空闲时间渲染，但是用户会看到我们的分割渲染的问题。
- * React的解决方案：使用双缓存机制，完成遍历全部fiber节点后进入commit阶段reconciliation后才去渲染effectList上的DOM并根据fiber的flag来处理对应的mutation。
+ * React的解决方案：使用双缓存机制，完成遍历全部fiber节点经过协调reconciliation后进入commit阶段才去渲染effectList上的DOM并根据fiber的flag来处理对应的mutation。
  */
 let nextUnitOfWork = null;
 // 对应着React的work in progress root fiber
 let wipRoot = null;
-//
 let currentRoot = null;
 let deletions = null;
 
 const Placement = /*                    */ 0b00000000000000000010;
 const Update = /*                       */ 0b00000000000000000100;
 const Deletion = /*                     */ 0b00000000000000001000;
+
+/**
+ * requestIdleCallback利用了浏览器的空闲的工作时间执行低优先级任务，并且不会影响用户的io等高优先级任务。
+ * React已经不使用requestIdleCallback了，但是概念还是以利用空闲时间
+ * https://github.com/facebook/react/issues/11171#issuecomment-417349573
+ */
+
+requestIdleCallback(workLoop);
+
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    // 该帧剩余可用时间的毫秒数,少于1代表没有空闲时间
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+
+  if (!nextUnitOfWork && wipRoot) {
+    commitRoot();
+  }
+
+  requestIdleCallback(workLoop);
+}
+
 
 function render(element, container) {
   // root fiber
@@ -81,7 +104,6 @@ function updateDom(dom, prevProps, nextProps) {
     .filter(isProperty)
     .filter(isNew(prevProps, nextProps))
     .forEach((name) => {
-      console.log("🚀 ~ file: render.js ~ line 84 ~ .forEach ~ name", name)
       dom[name] = nextProps[name];
     });
   // 新增事件监听
@@ -119,27 +141,6 @@ function commitWork(fiber) {
   commitWork(fiber.sibling);
 }
 
-function workLoop(deadline) {
-  let shouldYield = false;
-  while (nextUnitOfWork && !shouldYield) {
-    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
-    shouldYield = deadline.timeRemaining() < 1;
-  }
-
-  if (!nextUnitOfWork && wipRoot) {
-    commitRoot();
-  }
-
-  requestIdleCallback(workLoop);
-}
-/**
- * requestIdleCallback利用了浏览器的空闲的工作时间执行低优先级任务，并且不会影响用户的io等高优先级任务。
- * React已经不使用requestIdleCallback了，但是概念还是以利用空闲时间
- * https://github.com/facebook/react/issues/11171#issuecomment-417349573
- */
-
-requestIdleCallback(workLoop);
-
 function createDom(fiber) {
   const dom =
     fiber.type == "TEXT_ELEMENT"
@@ -157,10 +158,6 @@ function performUnitOfWork(fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber);
   }
-
-  // if (fiber.parent) {
-  //   fiber.parent.dom.appendChild(fiber.dom);
-  // }
 
   const elements = fiber.props.children;
   reconcileChildren(fiber, elements);

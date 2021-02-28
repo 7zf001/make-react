@@ -19,6 +19,7 @@ const rerender = (value) => {
     <div>
       <input onInput={updateValue} value={value} />
       <h2>Hello {value}</h2>
+      {value === "100" ? <div>100</div> : ""}
     </div>
   );
   MakeR.render(element, container);
