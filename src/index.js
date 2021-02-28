@@ -8,12 +8,20 @@ const MakeR = {
 
 /** 强制修改babel转换的函数名 */
 /** @jsx MakeR.createElement */
-const element = (
-  <div id="foo">
-    <span>b11ar</span>
-    <div style="width: 100px; height: 100px; background: red" />
-  </div>
-);
-
 const container = document.getElementById("root");
-MakeR.render(element, container);
+
+const updateValue = (e) => {
+  rerender(e.target.value);
+};
+
+const rerender = (value) => {
+  const element = (
+    <div>
+      <input onInput={updateValue} value={value} />
+      <h2>Hello {value}</h2>
+    </div>
+  );
+  MakeR.render(element, container);
+};
+
+rerender("World");
