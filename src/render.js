@@ -73,6 +73,7 @@ function performUnitOfWork(fiber) {
   let index = 0;
   let prevSibling = null;
 
+  // 处理child节点的关系，关联parent、child、sibing
   while (index < elements.length) {
     const element = elements[index];
     const newFiber = {
