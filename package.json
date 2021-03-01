@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "webpack serve --config webpack.config.js",
+    "dev": "webpack serve",
     "test": "jest --watch"
   },
   "repository": {

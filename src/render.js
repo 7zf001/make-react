@@ -40,7 +40,6 @@ function workLoop(deadline) {
   requestIdleCallback(workLoop);
 }
 
-
 function render(element, container) {
   // root fiber
   wipRoot = {
@@ -126,7 +125,12 @@ function commitRoot() {
 function commitWork(fiber) {
   if (!fiber) return;
 
-  const domParent = fiber.parent.dom;
+  // 处理function component:在当前节点不断往父级节点直到获取父级或父级以上的DOM
+  let domParentFiber = fiber.parent;
+  while (!domParentFiber.dom) {
+    domParentFiber = domParentFiber.parent;
+  }
+  const domParent = domParentFiber.dom;
 
   // 处理fiber中的mutation
   if (fiber.flags === Placement && fiber.dom != null) {
@@ -134,11 +138,19 @@ function commitWork(fiber) {
   } else if (fiber.flags === Update && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props);
   } else if (fiber.flags === Deletion) {
-    domParent.removeChild(fiber.dom);
+    commitDeletion(fiber, domParent)
   }
 
   commitWork(fiber.child);
   commitWork(fiber.sibling);
+}
+
+function commitDeletion(fiber, domParent) {
+  if (fiber.dom) {
+    domParent.removeChild(fiber.dom)
+  } else {
+    commitDeletion(fiber.child, domParent)
+  }
 }
 
 function createDom(fiber) {
@@ -153,14 +165,13 @@ function createDom(fiber) {
 }
 
 function performUnitOfWork(fiber) {
-  // 创建DOM Node
-  // fiber的dom链路
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber);
+  // 支持function component
+  const isFunctionComponent = fiber.type instanceof Function;
+  if (isFunctionComponent) {
+    updateFunctionComponent(fiber);
+  } else {
+    updateHostComponent(fiber);
   }
-
-  const elements = fiber.props.children;
-  reconcileChildren(fiber, elements);
 
   // 返回下个工作单元
   if (fiber.child) {
@@ -173,6 +184,26 @@ function performUnitOfWork(fiber) {
     }
     nextFiber = nextFiber.parent;
   }
+}
+
+function updateFunctionComponent(fiber) {
+  // 执行function component
+  const children = [fiber.type(fiber.props)];
+  console.log(
+    "🚀 ~ file: render.js ~ line 179 ~ updateFunctionComponent ~ children",
+    children
+  );
+  reconcileChildren(fiber, children);
+}
+
+function updateHostComponent(fiber) {
+  // 创建DOM Node
+  // fiber的dom链路
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+  const elements = fiber.props.children;
+  reconcileChildren(fiber, elements);
 }
 
 // 协调旧的fiber和新的dom节点
