@@ -138,7 +138,8 @@ function commitWork(fiber) {
   } else if (fiber.flags === Update && fiber.dom != null) {
     updateDom(fiber.dom, fiber.alternate.props, fiber.props);
   } else if (fiber.flags === Deletion) {
-    commitDeletion(fiber, domParent)
+    // 在处理function component中需要找到fc中第一个DOM元素来删除
+    commitDeletion(fiber, domParent);
   }
 
   commitWork(fiber.child);
@@ -147,9 +148,9 @@ function commitWork(fiber) {
 
 function commitDeletion(fiber, domParent) {
   if (fiber.dom) {
-    domParent.removeChild(fiber.dom)
+    domParent.removeChild(fiber.dom);
   } else {
-    commitDeletion(fiber.child, domParent)
+    commitDeletion(fiber.child, domParent);
   }
 }
 
@@ -186,14 +187,54 @@ function performUnitOfWork(fiber) {
   }
 }
 
+// work in progress fiber
+let wipFiber = null;
+let hookIndex = null;
+
 function updateFunctionComponent(fiber) {
+  wipFiber = fiber;
+  hookIndex = 0;
+  //  hooks array
+  wipFiber.hooks = [];
   // 执行function component
   const children = [fiber.type(fiber.props)];
-  console.log(
-    "🚀 ~ file: render.js ~ line 179 ~ updateFunctionComponent ~ children",
-    children
-  );
   reconcileChildren(fiber, children);
+}
+
+function useState(initial) {
+  // 检查是否有旧的hook，如果有旧的hook则复制旧的hook到新的hook，如果没有则使用initial
+  const oldHook =
+    wipFiber.alternate &&
+    wipFiber.alternate.hooks &&
+    wipFiber.alternate.hooks[hookIndex];
+
+  const hook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: [],
+  };
+
+  const actions = oldHook ? oldHook.queue : [];
+
+  actions.forEach((action) => {
+    hook.state = action(hook.state);
+  });
+
+  const setState = (action) => {
+    hook.queue.push(action);
+    wipRoot = {
+      dom: currentRoot.dom,
+      props: currentRoot.props,
+      alternate: currentRoot,
+    };
+    // 类似render方法的逻辑让workLoop执行nextUnitOfWork工作单元
+    nextUnitOfWork = wipRoot;
+    deletions = [];
+  };
+
+  wipFiber.hooks.push(hook);
+  hookIndex++;
+
+  return [hook.state, setState];
 }
 
 function updateHostComponent(fiber) {
@@ -267,4 +308,4 @@ function reconcileChildren(wipFiber, elements) {
   }
 }
 
-module.exports = { render };
+module.exports = { render, useState };

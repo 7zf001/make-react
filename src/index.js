@@ -1,17 +1,24 @@
 const { createElement } = require("./createElement");
-const { render } = require("./render");
+const { render, useState } = require("./render");
 
 const MakeR = {
   createElement,
   render,
+  useState,
 };
 
 /** 强制修改babel转换的函数名 */
 /** @jsx MakeR.createElement */
-const container = document.getElementById("root");
+function Counter() {
+  const [state, setState] = MakeR.useState(1);
 
-function App(props) {
-  return <h1>Hi {props.name}</h1>
+  return (
+    <div>
+      <h1 onClick={() => setState((c) => c + 1)}>Count: {state}</h1>
+    </div>
+  );
 }
-const element = <App name="foo" />
-MakeR.render(element, container)
+
+const element = <Counter />;
+const container = document.getElementById("root");
+MakeR.render(element, container);
