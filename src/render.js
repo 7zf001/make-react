@@ -202,12 +202,13 @@ function updateFunctionComponent(fiber) {
 }
 
 function useState(initial) {
-  // 检查是否有旧的hook，如果有旧的hook则复制旧的hook到新的hook，如果没有则使用initial
+  // wipFiber是当前的nextUnitOfWork对应的fiber
   const oldHook =
     wipFiber.alternate &&
     wipFiber.alternate.hooks &&
     wipFiber.alternate.hooks[hookIndex];
 
+  // 检查是否有旧的hook，如果有旧的hook则复制旧的hook到新的hook，如果没有则使用initial
   const hook = {
     state: oldHook ? oldHook.state : initial,
     queue: [],
