@@ -191,16 +191,6 @@ function performUnitOfWork(fiber) {
 let wipFiber = null;
 let hookIndex = null;
 
-function updateFunctionComponent(fiber) {
-  wipFiber = fiber;
-  hookIndex = 0;
-  //  hooks array
-  wipFiber.hooks = [];
-  // 执行function component
-  const children = [fiber.type(fiber.props)];
-  reconcileChildren(fiber, children);
-}
-
 function useState(initial) {
   // wipFiber是当前的nextUnitOfWork对应的fiber
   const oldHook =
@@ -236,6 +226,16 @@ function useState(initial) {
   hookIndex++;
 
   return [hook.state, setState];
+}
+
+function updateFunctionComponent(fiber) {
+  wipFiber = fiber;
+  hookIndex = 0;
+  //  hooks array
+  wipFiber.hooks = [];
+  // 执行function component
+  const children = [fiber.type(fiber.props)];
+  reconcileChildren(fiber, children);
 }
 
 function updateHostComponent(fiber) {

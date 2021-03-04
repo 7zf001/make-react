@@ -39,9 +39,28 @@ function App() {
 
 # 简易版 React 具体逻辑和思路
 
-0. 利用requestIdleCallback轮询在空闲时触发执行任务，判断是否有工作单元。
+0. 利用 requestIdleCallback 轮询在空闲时触发执行任务，判断是否有工作单元。
 1. 处理 craeteElement 生成的对象，赋值工作单元并等待浏览器空闲时间处理任务，并挂载到 FiberRoot
-2. performUnitOfWork开始处理工作单元，在第一次渲染时创建真实DOM但此时还没appendChild中
-3. 在处理工作单元中执行reconcileChildren进行协调逻辑，创建新的Fiber节点并且有flags属性提供UI的mutation。
-4. 当遍历完Fiber tree时，并且每个fiber节点中都有即将要mutaion的状态，进入commit阶段。
-5. commit阶段首先删除拥有deletion flags的fiber节点，然后开始从work in progress的fiber root下的child开始执行深入优先遍历对真实DOM的修改。
+2. performUnitOfWork 开始处理工作单元，在第一次渲染时创建真实 DOM 但此时还没 appendChild 中
+3. 在处理工作单元中执行 reconcileChildren 进行协调逻辑，创建新的 Fiber 节点并且有 flags 属性提供 UI 的 mutation。
+4. 当遍历完 Fiber tree 时，并且每个 fiber 节点中都有即将要 mutaion 的状态，进入 commit 阶段。
+5. commit 阶段首先删除拥有 deletion flags 的 fiber 节点，然后开始从 work in progress 的 fiber root 下的 child 开始执行深入优先遍历对真实 DOM 的修改。
+
+# jest 支持 esm
+
+安装转化cjs babel插件
+```
+npm install --save-dev @babel/plugin-transform-modules-commonjs
+```
+
+在`.babelrc`中添加
+
+```
+{
+  "env": {
+    "test": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    }
+  }
+}
+```

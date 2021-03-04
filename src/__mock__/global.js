@@ -1,0 +1,1 @@
+global.requestIdleCallback = jest.fn();
