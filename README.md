@@ -1,8 +1,8 @@
-Writing React
+# Writing React
 
 Before writing a React application, we need to set a goal. With a clear goal, we can complete our React development step by step in a more structured manner.
 
-Core Objectives
+## Core Objectives
 
 1. Write the `createElement` function
 
@@ -20,7 +20,7 @@ Core Objectives
 
 8. Implement basic Hooks
 
-Additional Tasks
+## Additional Tasks
 
 1. Set up a webpack compilation environment.
 
@@ -28,26 +28,29 @@ Additional Tasks
 
 3. Manage npm packages with Lerna.
 
-Understanding How JSX is Transformed into createElement
+## Understanding How JSX is Transformed into createElement
 
 import React from 'react';
 
+```
 function App() {
   return <h1>Hello World</h1>;
 }
+```
 
 ---After transpilation with @babel/plugin-transform-react-jsx---
 
+```
 import React from 'react';
 
 function App() {
   return React.createElement('h1', null, 'Hello world');
 }
-
+```
 
 Note: In React 17, JSX is no longer transpiled to call `createElement`. Instead, it automatically imports and invokes a new entry function from the React package.
 
-Specific Logic and Ideas for a Simplified React Implementation
+## Specific Logic and Ideas for a Simplified React Implementation
 
 1. Use `requestIdleCallback` for polling to trigger task execution during idle time, and check for available work units.
 
@@ -61,7 +64,7 @@ Specific Logic and Ideas for a Simplified React Implementation
 
 6. In the Commit phase: first, delete Fiber nodes marked with the `deletion` flag. Then, start a depth-first traversal from the `child` of the work-in-progress FiberRoot, and apply the necessary modifications to the actual DOM.
 
-Enabling ESM Support in Jest
+## Enabling ESM Support in Jest
 
 Install the Babel plugin for converting ESM to CommonJS:
 
@@ -69,6 +72,7 @@ npm install --save-dev @babel/plugin-transform-modules-commonjs
 
 Add the following configuration to `.babelrc`:
 
+```
 {
   "env": {
     "test": {
@@ -76,3 +80,4 @@ Add the following configuration to `.babelrc`:
     }
   }
 }
+```
